@@ -4,14 +4,24 @@
   "version": "1.0",
   "description": "A simple extension to analyze chess.com games on Lichess",
   "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js" // Register the background script
+  },
   "content_scripts": [
     {
       "matches": ["https://www.chess.com/game/*"],
-      "js": ["chess.js"]
+      "js": ["inject-chess.js"],
+      "run_at": "document_end"
     },
     {
       "matches": ["https://lichess.org/paste"],
       "js": ["lichess.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["chess.js"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

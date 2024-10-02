@@ -1,81 +1,39 @@
 // Function to execute when the button is clicked
-function executeYourCode() {
-  // Get the textarea element in the share modal
-  const textarea = document.querySelector("textarea"); // Adjust this selector if necessary
-  if (textarea) {
-    const pgnValue = textarea.value; // Get the value from the textarea
+function analyzeInLichess() {
+  // Get the chessboard element and call game.getPGN()
+  const boardSingle = document.getElementById("board-single");
 
-    // Save the value in Chrome's storage
-    chrome.storage.sync.set({ pgn: pgnValue }, () => {
-      console.log("PGN saved:", pgnValue);
-
-      // Open a new tab with the lichess paste URL
-      chrome.tabs.create({ url: "https://lichess.org/paste" });
-    });
+  if (boardSingle && boardSingle.game) {
+    const pgn = boardSingle.game.getPGN(); // Get the PGN from the game object
+    // Send a message to the content script to store the PGN
+    window.postMessage({ type: "STORE_PGN", pgn: pgn }, "*");
   } else {
-    console.log("Textarea not found.");
+    console.log("Game object not found or does not have getPGN() method.");
   }
 }
 
-// Function to append a button to the share modal
-function appendButton(copyButton) {
-  // Check if the button already exists to avoid duplicates
-  if (!document.getElementById("my-custom-button")) {
+// Function to append a button to #board-layout-main
+function appendButton() {
+  // Check if the button already exists
+  if (!document.getElementById("my-show-pgn-button")) {
     const button = document.createElement("button");
-    button.id = "my-custom-button";
-    button.textContent = "Analyze on lichess";
-    button.style.marginTop = "0px"; // Add some space from existing content
-    button.style.padding = "6px 9px"; // Add some space from existing content
+    button.id = "my-show-pgn-button";
+    button.textContent = "Analyze on Lichess";
+    button.style.marginTop = "18px"; // Add some space from existing content
+    button.style.padding = "6px"; // Add some padding for better appearance
+    button.style.maxWidth = "200px";
 
     // Add click event listener to the button
-    button.addEventListener("click", () => {
-      copyButton.click();
-    });
+    button.addEventListener("click", analyzeInLichess);
 
-    // Append the button to the modal
-    copyButton.parentElement.appendChild(button);
+    // Append the button to #board-layout-main
+    const boardLayoutMain = document.getElementById("board-layout-main");
+    console.log(boardLayoutMain);
+    if (boardLayoutMain) {
+      boardLayoutMain.appendChild(button);
+    }
   }
 }
 
-// Debounce function to limit the frequency of calls
-function debounce(func, delay) {
-  let timeoutId;
-  return function (...args) {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
-  };
-}
-
-// Function to handle changes in the #share-modal
-const handleShareModalContent = debounce((modal) => {
-  // Check if the modal has content and the specific element exists
-  const pgnCopyElement = modal.querySelector(".share-menu-tab-pgn-copy");
-  if (modal.hasChildNodes() && pgnCopyElement) {
-    appendButton(pgnCopyElement);
-    console.log("Share modal content with PGN copy detected!", modal);
-  }
-}, 1000); // 300 ms debounce delay
-
-// Select the #share-modal element
-const shareModal = document.getElementById("share-modal");
-
-// Set up a MutationObserver to monitor changes to the modal's content
-const observer = new MutationObserver((mutationsList) => {
-  for (let mutation of mutationsList) {
-    // Only call handleShareModalContent if child nodes have been added
-    if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
-      console.log("Mutation detected");
-      handleShareModalContent(shareModal);
-    }
-  }
-});
-
-// Start observing the #share-modal element for changes in its child nodes
-observer.observe(shareModal, {
-  childList: true, // Observe changes to direct children
-  subtree: true, // Observe the entire subtree (in case content is nested)
-});
+// Wait for the DOM to fully load before appending the button
+appendButton();
