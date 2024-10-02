@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "chesscom-to-lichess",
+  "version": "1.0",
+  "description": "A simple extension to analyze chess.com games on Lichess",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.chess.com/game/*"],
+      "js": ["chess.js"]
+    },
+    {
+      "matches": ["https://lichess.org/paste"],
+      "js": ["lichess.js"]
+    }
+  ]
+}
