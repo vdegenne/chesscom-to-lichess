@@ -9,7 +9,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.chess.com/game/*"],
+      "matches": [
+        "https://www.chess.com/game/*",
+        "https://www.chess.com/analysis/game/live/*"
+      ],
       "js": ["inject-chess.js"],
       "run_at": "document_end"
     },

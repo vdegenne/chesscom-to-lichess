@@ -39,3 +39,4 @@ function appendButton() {
 setInterval(() => {
   appendButton();
 }, 5000);
+appendButton();
