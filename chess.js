@@ -36,4 +36,6 @@ function appendButton() {
 }
 
 // Wait for the DOM to fully load before appending the button
-appendButton();
+setInterval(() => {
+  appendButton();
+}, 5000);
